@@ -3,13 +3,19 @@
 Package wildmatch solves inclusion problem for the wildcard path patterns.
 
 Supported patterns:
+
 `*` - any characters. zero or more.
+
 `?` - any character. exactly one.
+
 `/` - folder separator.
+
 `/**/` - any number of nested folders
 
 For example `a/b/*` is a subset of `a/?/*` but not a subset of `a/*`.
+
 This is because `*` includes any character withing folder/file name.
+
 For multiple folders matching use `/**/` pattern which means any number of nested folders.
 
 ```golang
