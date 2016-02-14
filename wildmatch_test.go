@@ -1,10 +1,25 @@
 package wildmatch
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// Examples
+
+func ExampleIsSubset_positive() {
+	fmt.Println(Wildcard("a/x?/cd").IsSubset("a/*/c?"))
+	// Output: a/x?/cd is a subset of the wildcard a/*/c?
+}
+
+func ExampleIsSubset_negative() {
+	fmt.Println(Wildcard("a/*/c").IsSubset("a/?/c"))
+	// Output: a/*/c is not a subset of a/?/c
+}
+
+// Tests
 
 func TestAlwaysPass(t *testing.T) {
 	assert.True(t, true)
