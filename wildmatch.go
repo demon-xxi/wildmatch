@@ -30,7 +30,7 @@ func (w Wildcard) IsSubset(set Wildcard) bool {
 	// check if this is a nested path
 	if sep >= 0 {
 
-		// if set is nested then tested wildcard must be nexted too
+		// if set is nested then tested wildcard must be nested too
 		if wsep < 0 {
 			return false
 		}
@@ -42,38 +42,35 @@ func (w Wildcard) IsSubset(set Wildcard) bool {
 			// Special case for /**/ mask that matches any number of levels
 			(set[:sep] == "**" &&
 				Wildcard(w[wsep+1:]).IsSubset(set))
-	} else {
-
-		// subset can't have more levels than set
-		if wsep >= 0 {
-			return false
-		}
-
-		// we are comparing names on the same nesing level here
-		// so let's do symbol by symbol comparison
-		switch string(set)[0] {
-		case '?':
-			// ? matches non empty character. '*' can't be a subset of '?'
-			if len(string(w)) == 0 || string(w)[0] == '*' {
-				return false
-			}
-			// any onther symbol matches '?', so let's skip to next
-			return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
-		case '*':
-			// '*' matches 0 and any other number of symbols
-			// so checking 0 and recursively subset without first letter
-			return w.IsSubset(Wildcard(string(set)[1:])) ||
-				(len(string(w)) > 0 && Wildcard(string(w)[1:]).IsSubset(set))
-		default:
-			// making sure next symbol in w exists and it's the same as in set
-			if len(string(w)) == 0 || string(w)[0] != string(set)[0] {
-				return false
-			}
-			// recursively check rest of the set and w
-			return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
-		}
-
 	}
 
-	return false
+	// subset can't have more levels than set
+	if wsep >= 0 {
+		return false
+	}
+
+	// we are comparing names on the same nesing level here
+	// so let's do symbol by symbol comparison
+	switch string(set)[0] {
+	case '?':
+		// ? matches non empty character. '*' can't be a subset of '?'
+		if len(string(w)) == 0 || string(w)[0] == '*' {
+			return false
+		}
+		// any onther symbol matches '?', so let's skip to next
+		return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
+	case '*':
+		// '*' matches 0 and any other number of symbols
+		// so checking 0 and recursively subset without first letter
+		return w.IsSubset(Wildcard(string(set)[1:])) ||
+			(len(string(w)) > 0 && Wildcard(string(w)[1:]).IsSubset(set))
+	default:
+		// making sure next symbol in w exists and it's the same as in set
+		if len(string(w)) == 0 || string(w)[0] != string(set)[0] {
+			return false
+		}
+		// recursively check rest of the set and w
+		return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
+	}
+
 }

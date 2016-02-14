@@ -61,6 +61,7 @@ func TestCaseSensitive(t *testing.T) {
 }
 
 func TestNested(t *testing.T) {
+	assert.False(t, Wildcard("a").IsSubset("a/b"))
 	assert.True(t, Wildcard("a/b").IsSubset("a/?"))
 	assert.True(t, Wildcard("a/b").IsSubset("a/*"))
 	assert.True(t, Wildcard("a/b").IsSubset("*/?"))
