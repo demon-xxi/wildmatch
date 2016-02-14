@@ -41,7 +41,8 @@ func (w Wildcard) IsSubset(set Wildcard) bool {
 			Wildcard(w[wsep+1:]).IsSubset(set[sep+1:])) ||
 			// Special case for /**/ mask that matches any number of levels
 			(set[:sep] == "**" &&
-				Wildcard(w[wsep+1:]).IsSubset(set))
+				(Wildcard(w[wsep+1:]).IsSubset(set)) ||
+				(w.IsSubset(set[sep+1:])))
 	}
 
 	// subset can't have more levels than set
