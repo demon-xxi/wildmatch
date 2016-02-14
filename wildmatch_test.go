@@ -11,12 +11,12 @@ import (
 
 func ExampleIsSubset_positive() {
 	fmt.Println(Wildcard("a/x?/cd").IsSubset("a/*/c?"))
-	// Output: a/x?/cd is a subset of the wildcard a/*/c?
+	// Output: true
 }
 
 func ExampleIsSubset_negative() {
 	fmt.Println(Wildcard("a/*/c").IsSubset("a/?/c"))
-	// Output: a/*/c is not a subset of a/?/c
+	// Output: false
 }
 
 // Tests
