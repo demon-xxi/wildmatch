@@ -74,5 +74,9 @@ func TestNested(t *testing.T) {
 	assert.False(t, Wildcard("a/b").IsSubset("**"))
 	assert.True(t, Wildcard("a/b/").IsSubset("**/"))
 	assert.True(t, Wildcard("a/b").IsSubset("a/**/b"))
+	assert.True(t, Wildcard("a/d").IsSubset("a/**/d"))
+	assert.True(t, Wildcard("a//d").IsSubset("a/**/d"))
+	assert.True(t, Wildcard("a/bc/d").IsSubset("a/**/d"))
 	assert.True(t, Wildcard("a/b/c/d").IsSubset("a/**/d"))
+	assert.True(t, Wildcard("a/b/c/e/f/d").IsSubset("a/**/d"))
 }

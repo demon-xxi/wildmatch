@@ -9,12 +9,13 @@ import (
 // It is an alias to the string type to provide extra methods of this package.
 type Wildcard string
 
+// IsSubset verifies if current wildcard is a subset of a given one.
+// Wildcard A is subset of B if any possible path that matches A also matches B.
 func (w Wildcard) IsSubset(set Wildcard) bool {
 	return IsSubset(string(w), string(set))
 }
 
-// IsSubset verifies if current wildcard is a subset of a given one.
-// Wildcard A is subset of B if any possible path that matches A also matches B.
+// IsSubset verifies if `w` wildcard is a subset of `set`.
 func IsSubset(w string, set string) bool {
 
 	// shortcut for identical sets
@@ -40,7 +41,7 @@ func IsSubset(w string, set string) bool {
 		}
 
 		// check that current level names are subsets
-		// and copare rest of the path to be subset also
+		// and compare rest of the path to be subset also
 		return (IsSubset(w[:wsep], set[:sep]) &&
 			IsSubset(w[wsep+1:], set[sep+1:])) ||
 			// Special case for /**/ mask that matches any number of levels
@@ -54,7 +55,7 @@ func IsSubset(w string, set string) bool {
 		return false
 	}
 
-	// we are comparing names on the same nesing level here
+	// we are comparing names on the same nesting level here
 	// so let's do symbol by symbol comparison
 	switch set[0] {
 	case '?':
@@ -74,7 +75,8 @@ func IsSubset(w string, set string) bool {
 		if len(w) == 0 || w[0] != set[0] {
 			return false
 		}
-		// recursively check rest of the set and w
-		return IsSubset(w[1:], set[1:])
 	}
+
+	// recursively check rest of the set and w
+	return IsSubset(w[1:], set[1:])
 }
