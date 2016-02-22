@@ -27,14 +27,20 @@ import (
 // Examples
 
 func ExampleIsSubset_positive() {
-	fmt.Println(Wildcard("a/x?/cd").IsSubset("a/*/c?"))
+	fmt.Println(Wildcard("a/x?/cd").IsSubsetOf("a/*/c?"))
 	// Output: true
 }
 
 func ExampleIsSubset_negative() {
-	fmt.Println(Wildcard("a/*/c").IsSubset("a/?/c"))
+	fmt.Println(Wildcard("a/*/c").IsSubsetOf("a/?/c"))
 	// Output: false
 }
 
+func ExampleIsSubsetOfAny() {
+	ans, _ := Wildcard("a*.txt").IsSubsetOfAny(Wildcard("*"), Wildcard("*.txt"),
+		Wildcard("*.t?t"), Wildcard("*.?x?"))
+	fmt.Println(ans)
+	// Output: *.txt
+}
 
 ```
