@@ -106,3 +106,22 @@ func (w Wildcard) IsSubsetOfAny(supersets ...Wildcard) (result Wildcard, found b
 	}
 	return
 }
+
+// IsSubsetOfAny verifies if current wildcard `w` is a subset of any of the given sets.
+// Wildcard A is subset of B if any possible path that matches A also matches B.
+// If multiple subsets match then the smallest or first lexicographical set is returned
+func IsSubsetOfAny(w string, sets ...string) (result string, found bool) {
+	for _, superset := range sets {
+		if !IsSubsetOf(w, superset) {
+			continue
+		}
+		found = true
+		if result == "" || IsSubsetOf(superset, result) {
+			result = superset
+		}
+	}
+	return
+}
+
+// NOTE it's hard to combine both IsSubsetOfAny() functions to one
+// because of missing []string <-> []Wildcard conversion
