@@ -36,5 +36,11 @@ func ExampleIsSubset_negative() {
 	// Output: false
 }
 
+func ExampleIsSubsetOfAny() {
+	ans, _ := Wildcard("a*.txt").IsSubsetOfAny(Wildcard("*"), Wildcard("*.txt"),
+		Wildcard("*.t?t"), Wildcard("*.?x?"))
+	fmt.Println(ans)
+	// Output: *.txt
+}
 
 ```
