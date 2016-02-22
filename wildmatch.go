@@ -9,9 +9,9 @@ import (
 // It is an alias to the string type to provide extra methods of this package.
 type Wildcard string
 
-// IsSubset verifies if current wildcard is a subset of a given one.
+// IsSubsetOf verifies if current wildcard is a subset of a given one.
 // Wildcard A is subset of B if any possible path that matches A also matches B.
-func (w Wildcard) IsSubset(set Wildcard) bool {
+func (w Wildcard) IsSubsetOf(set Wildcard) bool {
 
 	// shortcut for identical sets
 	if set == w {
@@ -37,12 +37,12 @@ func (w Wildcard) IsSubset(set Wildcard) bool {
 
 		// check that current level names are subsets
 		// and copare rest of the path to be subset also
-		return (Wildcard(w[:wsep]).IsSubset(set[:sep]) &&
-			Wildcard(w[wsep+1:]).IsSubset(set[sep+1:])) ||
+		return (Wildcard(w[:wsep]).IsSubsetOf(set[:sep]) &&
+			Wildcard(w[wsep+1:]).IsSubsetOf(set[sep+1:])) ||
 			// Special case for /**/ mask that matches any number of levels
 			(set[:sep] == "**" &&
-				(Wildcard(w[wsep+1:]).IsSubset(set)) ||
-				(w.IsSubset(set[sep+1:])))
+				(Wildcard(w[wsep+1:]).IsSubsetOf(set)) ||
+				(w.IsSubsetOf(set[sep+1:])))
 	}
 
 	// subset can't have more levels than set
@@ -59,19 +59,35 @@ func (w Wildcard) IsSubset(set Wildcard) bool {
 			return false
 		}
 		// any onther symbol matches '?', so let's skip to next
-		return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
+		return Wildcard(string(w)[1:]).IsSubsetOf(Wildcard(string(set)[1:]))
 	case '*':
 		// '*' matches 0 and any other number of symbols
 		// so checking 0 and recursively subset without first letter
-		return w.IsSubset(Wildcard(string(set)[1:])) ||
-			(len(string(w)) > 0 && Wildcard(string(w)[1:]).IsSubset(set))
+		return w.IsSubsetOf(Wildcard(string(set)[1:])) ||
+			(len(string(w)) > 0 && Wildcard(string(w)[1:]).IsSubsetOf(set))
 	default:
 		// making sure next symbol in w exists and it's the same as in set
 		if len(string(w)) == 0 || string(w)[0] != string(set)[0] {
 			return false
 		}
 		// recursively check rest of the set and w
-		return Wildcard(string(w)[1:]).IsSubset(Wildcard(string(set)[1:]))
+		return Wildcard(string(w)[1:]).IsSubsetOf(Wildcard(string(set)[1:]))
 	}
 
+}
+
+// IsSubsetOfAny verifies if current wildcard is a subset of any of the given sets.
+// Wildcard A is subset of B if any possible path that matches A also matches B.
+// If multiple subsets match then the smallest or first lexicographical set is returned
+func (w Wildcard) IsSubsetOfAny(sets ...Wildcard) (result Wildcard, found bool) {
+	for _, set := range sets {
+		if !w.IsSubsetOf(set) {
+			continue
+		}
+		found = true
+		if result == "" || set.IsSubsetOf(result) {
+			result = set
+		}
+	}
+	return
 }
