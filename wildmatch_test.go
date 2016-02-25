@@ -10,35 +10,19 @@ import (
 // Examples
 
 func ExampleIsSubsetOf_positive() {
-	fmt.Println(Wildcard("a/x?/cd").IsSubsetOf("a/*/c?"))
+	fmt.Println(IsSubsetOf("a/x?/cd", "a/*/c?"))
 	// Output: true
 }
 
 func ExampleIsSubsetOf_negative() {
-	fmt.Println(Wildcard("a/*/c").IsSubsetOf("a/?/c"))
+	fmt.Println(IsSubsetOf("a/*/c", "a/?/c"))
 	// Output: false
 }
 
 func ExampleIsSubsetOfAny() {
-	ans, _ := Wildcard("a*.txt").IsSubsetOfAny(Wildcard("*"), Wildcard("*.txt"),
-		Wildcard("*.t?t"), Wildcard("*.?x?"))
+	ans := IsSubsetOfAny("a*.txt", "*", "*.txt", "*.t?t", "*.?x?")
 	fmt.Println(ans)
-	// Output: *.txt
-}
-
-//Shim for 2 param return values
-func M(a, b interface{}) []interface{} {
-	return []interface{}{a, b}
-}
-
-//Shim for 3 param return values
-func M3(a, b, c interface{}) []interface{} {
-	return []interface{}{a, b, c}
-}
-
-//Shim for 4 param return values
-func M4(a, b, c, d interface{}) []interface{} {
-	return []interface{}{a, b, c, d}
+	// Output: 1
 }
 
 // Tests
@@ -50,70 +34,70 @@ func TestAlwaysPass(t *testing.T) {
 func TestIdenticWildcards(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.True(Wildcard("a").IsSubsetOf("a"))
-	assert.True(Wildcard("a/b").IsSubsetOf("a/b"))
-	assert.True(Wildcard("").IsSubsetOf(""))
-	assert.True(Wildcard("*").IsSubsetOf("*"))
-	assert.True(Wildcard("?").IsSubsetOf("?"))
+	assert.True(IsSubsetOf("a", "a"))
+	assert.True(IsSubsetOf("a/b", "a/b"))
+	assert.True(IsSubsetOf("", ""))
+	assert.True(IsSubsetOf("*", "*"))
+	assert.True(IsSubsetOf("?", "?"))
 }
 
 func TestSimpleCases(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.True(Wildcard("a.txt").IsSubsetOf("a.txt"))
-	assert.False(Wildcard("a.txt").IsSubsetOf("a.doc"))
-	assert.False(Wildcard("a").IsSubsetOf("b"))
-	assert.True(Wildcard("").IsSubsetOf("*"))
-	assert.True(Wildcard("?").IsSubsetOf("*"))
-	assert.True(Wildcard("a").IsSubsetOf("?"))
-	assert.True(Wildcard("??").IsSubsetOf("*"))
-	assert.True(Wildcard("?a?").IsSubsetOf("*"))
-	assert.True(Wildcard("?*?").IsSubsetOf("*"))
-	assert.True(Wildcard("*?").IsSubsetOf("*"))
-	assert.True(Wildcard("?*").IsSubsetOf("*"))
-	assert.True(Wildcard("*a").IsSubsetOf("*"))
-	assert.True(Wildcard("*").IsSubsetOf("**"))
-	assert.False(Wildcard("*").IsSubsetOf("?"))
-	assert.False(Wildcard("*").IsSubsetOf("a"))
-	assert.False(Wildcard("?").IsSubsetOf("a"))
-	assert.False(Wildcard("?").IsSubsetOf("??"))
+	assert.True(IsSubsetOf("a.txt", "a.txt"))
+	assert.False(IsSubsetOf("a.txt", "a.doc"))
+	assert.False(IsSubsetOf("a", "b"))
+	assert.True(IsSubsetOf("", "*"))
+	assert.True(IsSubsetOf("?", "*"))
+	assert.True(IsSubsetOf("a", "?"))
+	assert.True(IsSubsetOf("??", "*"))
+	assert.True(IsSubsetOf("?a?", "*"))
+	assert.True(IsSubsetOf("?*?", "*"))
+	assert.True(IsSubsetOf("*?", "*"))
+	assert.True(IsSubsetOf("?*", "*"))
+	assert.True(IsSubsetOf("*a", "*"))
+	assert.True(IsSubsetOf("*", "**"))
+	assert.False(IsSubsetOf("*", "?"))
+	assert.False(IsSubsetOf("*", "a"))
+	assert.False(IsSubsetOf("?", "a"))
+	assert.False(IsSubsetOf("?", "??"))
 }
 
 func TestCaseSensitive(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.True(Wildcard("Ab").IsSubsetOf("Ab"))
-	assert.True(Wildcard("Ab/c").IsSubsetOf("Ab/c"))
-	assert.False(Wildcard("Ab").IsSubsetOf("ab"))
-	assert.False(Wildcard("A/b").IsSubsetOf("a/b"))
+	assert.True(IsSubsetOf("Ab", "Ab"))
+	assert.True(IsSubsetOf("Ab/c", "Ab/c"))
+	assert.False(IsSubsetOf("Ab", "ab"))
+	assert.False(IsSubsetOf("A/b", "a/b"))
 }
 
 func TestNested(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.False(Wildcard("a").IsSubsetOf("a/b"))
-	assert.True(Wildcard("a/b").IsSubsetOf("a/?"))
-	assert.True(Wildcard("a/b").IsSubsetOf("a/*"))
-	assert.True(Wildcard("a/b").IsSubsetOf("*/?"))
-	assert.True(Wildcard("aa/b").IsSubsetOf("*/?"))
-	assert.False(Wildcard("a/bb").IsSubsetOf("*/?"))
-	assert.True(Wildcard("aa/b").IsSubsetOf("**/*"))
-	assert.True(Wildcard("a/b/c").IsSubsetOf("*/**b**/*"))
-	assert.True(Wildcard("aa/b/c/d").IsSubsetOf("**/*"))
-	assert.False(Wildcard("a/bb").IsSubsetOf("*"))
-	assert.False(Wildcard("a/b").IsSubsetOf("**"))
-	assert.True(Wildcard("a/b/").IsSubsetOf("**/"))
-	assert.True(Wildcard("a/b").IsSubsetOf("a/**/b"))
-	assert.True(Wildcard("a//d").IsSubsetOf("a/**/d"))
-	assert.True(Wildcard("a/bc/d").IsSubsetOf("a/**/d"))
-	assert.True(Wildcard("a/b/c/d").IsSubsetOf("a/**/d"))
-	assert.True(Wildcard("a/b/c/e/f/d").IsSubsetOf("a/**/d"))
+	assert.False(IsSubsetOf("a", "a/b"))
+	assert.True(IsSubsetOf("a/b", "a/?"))
+	assert.True(IsSubsetOf("a/b", "a/*"))
+	assert.True(IsSubsetOf("a/b", "*/?"))
+	assert.True(IsSubsetOf("aa/b", "*/?"))
+	assert.False(IsSubsetOf("a/bb", "*/?"))
+	assert.True(IsSubsetOf("aa/b", "**/*"))
+	assert.True(IsSubsetOf("a/b/c", "*/**b**/*"))
+	assert.True(IsSubsetOf("aa/b/c/d", "**/*"))
+	assert.False(IsSubsetOf("a/bb", "*"))
+	assert.False(IsSubsetOf("a/b", "**"))
+	assert.True(IsSubsetOf("a/b/", "**/"))
+	assert.True(IsSubsetOf("a/b", "a/**/b"))
+	assert.True(IsSubsetOf("a//d", "a/**/d"))
+	assert.True(IsSubsetOf("a/bc/d", "a/**/d"))
+	assert.True(IsSubsetOf("a/b/c/d", "a/**/d"))
+	assert.True(IsSubsetOf("a/b/c/e/f/d", "a/**/d"))
 }
 
 func TestIsSubsetOfAny(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.Equal(M(Wildcard("*"), true), M(Wildcard("a").IsSubsetOfAny("*", "*.txt", "**/*")))
-	assert.Equal(M(Wildcard(""), false), M(Wildcard("a").IsSubsetOfAny("*.txt", "**/*")))
-	assert.Equal(M(Wildcard("a/b/*"), true), M(Wildcard("a/b/c").IsSubsetOfAny("*", "**/*", "a/b/*", "a/*", "**/*")))
+	assert.Equal(0, IsSubsetOfAny("a", "*", "*.txt", "**/*"))
+	assert.Equal(-1, IsSubsetOfAny("a", "*.txt", "**/*"))
+	assert.Equal(2, IsSubsetOfAny("a/b/c", "*", "**/*", "a/b/*", "a/*", "**/*"))
 }

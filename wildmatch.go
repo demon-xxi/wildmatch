@@ -5,24 +5,9 @@ import (
 	"strings"
 )
 
-// Wildcard respresents wildcard pattern.
-// It is an alias to the string type to provide extra methods of this package.
-type Wildcard string
-
-// IsSubset verifies if current wildcard is a subset of a given one `superset`.
-// Wildcard A is subset of B if any possible path that matches A also matches B.
-func (w Wildcard) IsSubsetOf(superset Wildcard) bool {
-	return IsSubsetOf(string(w), string(superset))
-}
-
-// Contains verifies if current wildcard is a superset of a given one `subset`.
-// This operation is inversion of IsSubsetOf().
-func (w Wildcard) Contains(subset Wildcard) bool {
-	return IsSubsetOf(string(subset), string(w))
-}
-
 // IsSubsetOf verifies if `w` wildcard is a subset of `s`.
 // I.e. checks if `s` is a superset of subset `w`.
+// Wildcard A is subset of B if any possible path that matches A also matches B.
 func IsSubsetOf(w string, s string) bool {
 
 	// shortcut for identical sets
@@ -91,38 +76,11 @@ func IsSubsetOf(w string, s string) bool {
 	return IsSubsetOf(w[1:], s[1:])
 }
 
-// IsSubsetOfAny verifies if current wildcard is a subset of any of the given sets.
-// Wildcard A is subset of B if any possible path that matches A also matches B.
-// If multiple subsets match then the smallest or first lexicographical set is returned
-func (w Wildcard) IsSubsetOfAny(supersets ...Wildcard) (result Wildcard, found bool) {
-	for _, superset := range supersets {
-		if !w.IsSubsetOf(superset) {
-			continue
-		}
-		found = true
-		if result == "" || superset.IsSubsetOf(result) {
-			result = superset
-		}
-	}
-	return
-}
-
-// IsSubsetOfAny verifies if current wildcard `w` is a subset of any of the given sets.
-// Wildcard A is subset of B if any possible path that matches A also matches B.
-// If multiple subsets match then the smallest or first lexicographical set is returned
-func IsSubsetOfAny(w string, sets ...string) (result string, found bool) {
-	if index := IsSubsetOfAnyI(w, sets...); index >= 0 {
-		return sets[index], true
-	}
-
-	return "", false // not found
-}
-
 // IsSubsetOfAny verifies if current wildcard `w` is a subset of any of the given sets.
 // Wildcard A is subset of B if any possible path that matches A also matches B.
 // If multiple subsets match then the smallest or first lexicographical set is returned
 // Return -1 if not found or superset index.
-func IsSubsetOfAnyI(w string, sets ...string) (found int) {
+func IsSubsetOfAny(w string, sets ...string) (found int) {
 	found = -1 // not found by default
 	for i, superset := range sets {
 		if !IsSubsetOf(w, superset) {
